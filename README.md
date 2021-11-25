@@ -43,6 +43,7 @@ Retorno
 }
 ```
 
+Header -> Authorization: Token <token-do-partner>
 Cadastrar Stor
 POST /api/stor
 
@@ -74,6 +75,7 @@ Retorno
 }
 ```
 
+Header -> Authorization: Token <token-do-partner>
 Criar Produtos
 POST /api/product/
 
@@ -85,6 +87,7 @@ POST /api/product/
 }
 ```
 
+Header -> Authorization: Token <token-do-user>
 Criar Orders
 POST /api/orders/
 
@@ -93,49 +96,60 @@ POST /api/orders/
 ```
 
 Listar order por Id
-
+Header -> Authorization: Token <token-do-partner-or-user>
 ` GET /api/order/<int:pk>`
 
 Listar order
+Header -> Authorization: Token <token-do-partner-or-user>
 
 ` GET /api/order/`
 
 Listar Stor
+Header -> Authorization: Token <token-do-user>
 
 `GET /api/stor/`
 
-Listar Stor por id
+Buscar Stor por id
+Header -> Authorization: Token <token-do-user>
 
 `GET /api/stor/<int:pk>`
 
 Atualizar Stor
+Header -> Authorization: Token <token-do-partner>
 
 `PUT /api/stor/<int:pk>`
 
 Deletar Stor
+Header -> Authorization: Token <token-do-partner>
 
 `DELETE /api/stor/<int:pk>`
 
-Listar Categorias
+Listar lojas por Categorias
+Header -> Authorization: Token <token-do-user>
 
 `GET /api/stor?category=pizzaria/`
 
 Listar produtos por Loja
+Header -> Authorization: Token <token-do-partner-or-user>
 
 `GET /api/stor/products/`
 
 Atualizar Produto Stor
+Header -> Authorization: Token <token-do-partner>
 
 `PUT /api/products/<int:pk>`
 
-Atualizar Produto Stor
+Delete Produto Stor
+Header -> Authorization: Token <token-do-partner>
 
 `DELETE /api/products/<int:pk>`
 
 Listar produtos por categoria Loja
+Header -> Authorization: Token <token-do-partner-or-user>
 
 `GET /api/stor/products/?category=drink`
 
 Listar lojas proximas
+Header -> Authorization: Token <token-do-user>
 
 `GET /api/category?category=pizzaria`
