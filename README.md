@@ -92,10 +92,50 @@ POST /api/orders/
 {}
 ```
 
+Listar order por Id
+
+` GET /api/order/<int:pk>`
+
+Listar order
+
+` GET /api/order/`
+
 Listar Stor
 
 `GET /api/stor/`
 
+Listar Stor por id
+
+`GET /api/stor/<int:pk>`
+
+Atualizar Stor
+
+`PUT /api/stor/<int:pk>`
+
+Deletar Stor
+
+`DELETE /api/stor/<int:pk>`
+
 Listar Categorias
 
-`GET /api/category/`
+`GET /api/stor?category=pizzaria/`
+
+Listar produtos por Loja
+
+`GET /api/stor/products/`
+
+Atualizar Produto Stor
+
+`PUT /api/products/<int:pk>`
+
+Atualizar Produto Stor
+
+`DELETE /api/products/<int:pk>`
+
+Listar produtos por categoria Loja
+
+`GET /api/stor/products/?category=drink`
+
+Listar lojas proximas
+
+`GET /api/category?category=pizzaria`
