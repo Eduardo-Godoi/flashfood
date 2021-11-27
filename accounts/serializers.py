@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from accounts.models import User, UserAdress
+from accounts.models import User, Adress
 
 class AdressSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UserAdress
+        model = Adress
         fields = '__all__'
 
         extra_kwargs = {
