@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from utils.permissions import IsPartnerPermisson
@@ -12,7 +13,7 @@ from .serializers import StorSerializer
 class StorView(ModelViewSet):
     queryset = Stor.objects.all()
     serializer_class = StorSerializer
-    permission_classes = [IsPartnerPermisson]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsPartnerPermisson]
     authentication_classes = [TokenAuthentication]
 
     def get_serializer(self, *args, **kwargs):
@@ -44,5 +45,5 @@ class StorView(ModelViewSet):
         if 'category' in self.request.GET:
             stor = get_object_or_404(Stor, id=kwargs.get('pk'))
             return stor.products.filter(name__contains=self.request.GET['category'])
-        serialized = ProductSerializer(stor.products, many=True)
+        serialized = ProductSerializer(stor.products)
         return Response(serialized.data)
