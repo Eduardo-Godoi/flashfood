@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Stor, StorCategory
-from .serializers import StorSerializer
+from .serializers import StorSerializer, StorCategorySerializer
 
 
 class StorView(ModelViewSet):
@@ -21,7 +21,8 @@ class StorView(ModelViewSet):
         number = self.request.data.get('number', None)
         category = self.request.data.get('category')
 
-        self.request.data['category'] = {'name': category}
+        if category:
+            self.request.data['category'] = {'name': category.title()}
 
         self.request.data['adress'] = {
             'street': street,
@@ -33,8 +34,10 @@ class StorView(ModelViewSet):
 
     def filter_queryset(self, queryset):
         if 'category' in self.request.GET:
-            return queryset.filter(name__contains=self.request.GET['category'])
+            category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
+            return queryset.filter(category_id=category.id)
         return queryset
+
 
     @action(detail=True, methods=['get'], url_path='products')
     def list_product(self, request,  *args, **kwargs):
