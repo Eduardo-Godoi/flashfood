@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Stor, StorCategory
-from .serializers import StorSerializer, StorCategorySerializer
+from .serializers import StorSerializer
 
 
 class StorView(ModelViewSet):
