@@ -20,7 +20,7 @@ class StorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Stor
-        fields = '__all__'
+        fields = ['id', 'name', 'category', 'owner', 'adress']
 
     def create(self, validated_data):
         user = self.context['request'].user
@@ -40,6 +40,9 @@ class StorSerializer(serializers.ModelSerializer):
         instace_adress = get_object_or_404(Adress, id=instance.adress.id)
         super().update(instace_adress, adress_data)
 
+        instance_stor = get_object_or_404(Stor, id=instance.id)
+
         category, _ = StorCategory.objects.get_or_create(**category_data)
-        category.stors.add(instance)
-        return super().update(instance, validated_data)
+        category.stors.add(instance_stor)
+
+        return super().update(instance_stor, validated_data)
