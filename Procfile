@@ -1,1 +1,1 @@
-web: gunicorn flash_food.wsgi
+web: gunicorn flashfood.wsgi
