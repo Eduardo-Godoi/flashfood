@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from utils.permissions import IsPartnerPermisson
 
 from .models import Stor, StorCategory
 from .serializers import StorSerializer
@@ -12,7 +12,7 @@ from .serializers import StorSerializer
 class StorView(ModelViewSet):
     queryset = Stor.objects.all()
     serializer_class = StorSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsPartnerPermisson]
     authentication_classes = [TokenAuthentication]
 
     def get_serializer(self, *args, **kwargs):
