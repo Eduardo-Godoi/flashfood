@@ -11,6 +11,14 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
+import os
+
+DB_NAME = os.environ.get('DB_NAME')
+DB_USER = os.environ.get('DB_USER')
+DB_PWD = os.environ.get('DB_PWD')
+DB_HOST = os.environ.get('DB_HOST')
+DB_PORT = os.environ.get('DB_PORT')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +33,7 @@ SECRET_KEY = 'django-insecure-d-w0=47z^7q3sy$xkqq&26fw88^n_dcf-@21ol@l!(cu2aq)f*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['foodflash.herokuapp.com', 'localhost']
 
 
 # Application definition
@@ -81,11 +89,22 @@ WSGI_APPLICATION = 'flashfood.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PWD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT
     }
 }
 
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    db_from_env = dj_database_url.config(
+        default=DATABASE_URL, conn_max_age=500, ssl_require=True)
+    DATABASES['default'].update(db_from_env)
+    DEBUG = False
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
