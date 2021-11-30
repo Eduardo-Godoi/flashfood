@@ -14,7 +14,6 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
-        
 
     def create(self, validated_data):
         view_kwarg = self.context["view"].kwargs
