@@ -3,11 +3,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from orders.models import Order
 from orders.serializers import OrderSerializer
+from rest_framework.authentication import TokenAuthentication
+
+from utils.permissions import IsCustumerPermission
 
 
 class OrderView(GenericAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCustumerPermission]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
