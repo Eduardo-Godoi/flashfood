@@ -4,7 +4,7 @@ from rest_framework.viewsets import GenericViewSet
 from utils.permissions import IsPartnerPermisson
 
 from .models import Product
-from .serializer import ProductSerializer
+from .serializers import ProductSerializer
 
 
 class ProductView(mixins.CreateModelMixin,
