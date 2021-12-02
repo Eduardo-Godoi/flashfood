@@ -1,13 +1,16 @@
 from django.shortcuts import get_object_or_404
+from products.models import ProductCategory
+from products.serializers import ProductSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from utils.permissions import IsPartnerPermisson
+from utils.geolocation import calculate_route
+from utils.permissions import IsCustumerPermission, IsPartnerPermisson
 
 from .models import Stor, StorCategory
-from .serializers import StorSerializer
+from .serializers import StorCategorySerializer, StorSerializer
 
 
 class StorView(ModelViewSet):
@@ -39,11 +42,37 @@ class StorView(ModelViewSet):
             return queryset.filter(category_id=category.id)
         return queryset
 
-
     @action(detail=True, methods=['get'], url_path='products')
     def list_product(self, request,  *args, **kwargs):
+        stor = get_object_or_404(Stor, id=kwargs.get('pk'))
+
         if 'category' in self.request.GET:
-            stor = get_object_or_404(Stor, id=kwargs.get('pk'))
-            return stor.products.filter(name__contains=self.request.GET['category'])
-        serialized = ProductSerializer(stor.products)
+            category = ProductCategory.objects.filter(name=self.request.GET['category'])
+            products = stor.product.filter(category=category[0].id)
+
+            serialized = ProductSerializer(products, many=True)
+            return Response(serialized.data)
+
+        serialized = ProductSerializer(stor.product, many=True)
+        return Response(serialized.data)
+
+
+class ShowNearbyStores(ModelViewSet):
+    queryset = Stor.objects.all()
+    serializer_class = StorCategorySerializer
+
+    permission_classes = [IsCustumerPermission]
+    authentication_classes = [TokenAuthentication]
+
+    def list(self, queryset):
+        customer = self.request.user
+
+        if 'category' in self.request.GET:
+            category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
+            list_of_stores = Stor.objects.filter(category_id=category.id)
+            stors = calculate_route(customer, list_of_stores)
+            return Response(stors)
+
+        categorys = StorCategory.objects.all()
+        serialized = StorCategorySerializer(categorys, many=True)
         return Response(serialized.data)
