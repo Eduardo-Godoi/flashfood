@@ -14,9 +14,7 @@ def geocoding(geo_data):
 
 
 def calculate_route(customer, list_of_stores):
-    import pdb
 
-    # pdb.set_trace()
     customer = customer.adress.coordinates
     stors = []
 
