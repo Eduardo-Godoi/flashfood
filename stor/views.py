@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from products.models import ProductCategory
-from products.serializers import ProductSerializer
+from products.serializers import ProductSerializer, ProductStorSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -9,8 +9,9 @@ from rest_framework.viewsets import ModelViewSet
 from utils.geolocation import calculate_route
 from utils.permissions import IsCustumerPermission, IsPartnerPermisson
 
-from .models import Stor, StorCategory
-from .serializers import StorCategorySerializer, StorSerializer
+from .models import Review, Stor, StorCategory
+from .serializers import (ReviewSerializer, StorCategorySerializer,
+                          StorSerializer)
 
 
 class StorView(ModelViewSet):
@@ -50,10 +51,10 @@ class StorView(ModelViewSet):
             category = ProductCategory.objects.filter(name=self.request.GET['category'])
             products = stor.product.filter(category=category[0].id)
 
-            serialized = ProductSerializer(products, many=True)
+            serialized = ProductStorSerializer(products, many=True)
             return Response(serialized.data)
 
-        serialized = ProductSerializer(stor.product, many=True)
+        serialized = ProductStorSerializer(stor.product, many=True)
         return Response(serialized.data)
 
 
@@ -76,3 +77,25 @@ class ShowNearbyStores(ModelViewSet):
         categorys = StorCategory.objects.all()
         serialized = StorCategorySerializer(categorys, many=True)
         return Response(serialized.data)
+
+
+class ReviewView(ModelViewSet):
+
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCustumerPermission]
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = get_object_or_404(queryset, user=self.request.user)
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    def filter_queryset(self, queryset):
+        stor = get_object_or_404(Stor, id=self.kwargs["pk"])
+        queryset = queryset.filter(stor=stor)
+
+        return super().filter_queryset(queryset)
