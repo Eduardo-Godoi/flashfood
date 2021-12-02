@@ -3,10 +3,12 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from utils.geolocation import calculate_route
 from utils.permissions import IsCustumerPermission, IsPartnerPermisson
 
 from .models import Review, Stor, StorCategory
-from .serializers import ReviewSerializer, StorSerializer
+from .serializers import (ReviewSerializer, StorCategorySerializer,
+                          StorSerializer)
 
 
 class StorView(ModelViewSet):
@@ -67,3 +69,23 @@ class ReviewView(ModelViewSet):
         queryset = queryset.filter(stor=stor)
 
         return super().filter_queryset(queryset)
+
+
+class ShowNearbyStores(ModelViewSet):
+    queryset = Stor.objects.all()
+    serializer_class = StorCategorySerializer
+
+    permission_classes = [IsCustumerPermission]
+    authentication_classes = [TokenAuthentication]
+
+    def list(self, queryset):
+        customer = self.request.user
+
+        if 'category' in self.request.GET:
+            category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
+            list_of_stores = Stor.objects.filter(category_id=category.id)
+            stors = calculate_route(customer, list_of_stores)
+            return Response(stors)
+        categorys = StorCategory.objects.all()
+        serialized = StorCategorySerializer(categorys, many=True)
+        return Response(serialized.data)
