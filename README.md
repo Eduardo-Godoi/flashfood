@@ -433,7 +433,16 @@
 
 ```json
 // RESPONSE STATUS -> HTTP 200 OK
-{}
+  {
+    "id": 1,
+    "name": "Fanta Laranja",
+    "price": 4.99
+  },
+  {
+    "id": 3,
+    "name": "Coca-cola",
+    "price": 8.99
+  }
 ```
 
 ### `POST /api/orders/` - Criar Orders
