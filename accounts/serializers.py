@@ -1,18 +1,19 @@
 from rest_framework import serializers
 
-from accounts.models import User, Adress
+from accounts.models import Adress, User
+
 
 class AdressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Adress
-        fields = '__all__'
-
+        exclude = ['coordinates']
         extra_kwargs = {
             'id': {
                 'read_only': True
             }
         }
+
 
 class UserSerializer(serializers.ModelSerializer):
 

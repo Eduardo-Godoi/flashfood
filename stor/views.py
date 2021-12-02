@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from utils.geolocation import calculate_route
+from utils.geolocation import calculate_route, geocoding
 from utils.permissions import IsCustumerPermission, IsPartnerPermisson
 
 from .models import Review, Stor, StorCategory
@@ -25,6 +25,10 @@ class StorView(ModelViewSet):
         district = self.request.data.get('district', None)
         number = self.request.data.get('number', None)
         category = self.request.data.get('category')
+        city = self.request.data.get('city', None)
+        state = self.request.data.get('state', None)
+        cep = self.request.data.get('cep', None)
+        coordinates = geocoding(self.request.data)
 
         if category:
             self.request.data['category'] = {'name': category.title()}
@@ -32,7 +36,11 @@ class StorView(ModelViewSet):
         self.request.data['adress'] = {
             'street': street,
             'district': district,
-            'number': number
+            'number': number,
+            'city': city,
+            'state': state,
+            'cep': cep,
+            'coordinates': coordinates
         }
 
         return super().get_serializer(*args, **kwargs)
