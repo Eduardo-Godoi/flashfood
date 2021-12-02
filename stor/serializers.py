@@ -4,9 +4,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.fields import IntegerField
+from utils.exceptions import BadRequest, Unauthorized, UnprocessableEntity
 
 from .models import Review, Stor, StorCategory
-from utils.exceptions import UnprocessableEntity, BadRequest
 
 
 class StorCategorySerializer(serializers.ModelSerializer):
@@ -15,6 +15,14 @@ class StorCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
 
+
+class OwnerStorSerializer(serializers.ModelSerializer):
+    adress = AdressSerializer()
+    category = StorCategorySerializer()
+
+    class Meta:
+        model = Stor
+        fields = ['id', 'name', 'category', 'adress']
 
 class StorSerializer(serializers.ModelSerializer):
     adress = AdressSerializer()
@@ -49,6 +57,17 @@ class StorSerializer(serializers.ModelSerializer):
         category.stors.add(instance_stor)
 
         return super().update(instance_stor, validated_data)
+
+    def validate(self, attrs):
+        http_method = self.context['request'].method
+        if http_method == 'PUT':
+            user = self.context["request"].user
+            stor_id = self.context['view'].kwargs["pk"]
+            stor = Stor.objects.filter(id=stor_id).first()
+
+            if user.id is not stor.owner.id:
+                raise Unauthorized()
+        return super().validate(attrs)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

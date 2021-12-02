@@ -13,3 +13,10 @@ class BadRequest(APIException):
     status_code = 400
     default_detail = "You need to place an order first."
     default_code = "bad_request"
+
+
+class Unauthorized(APIException):
+
+    status_code = 401
+    default_detail = "This store does not belong to you"
+    default_code = " Unauthorized"
