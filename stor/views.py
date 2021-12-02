@@ -4,7 +4,7 @@ from products.serializers import ProductSerializer, ProductStorSerializer
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from utils.exceptions import Unauthorized
@@ -19,7 +19,7 @@ from .serializers import (OwnerStorSerializer, ReviewSerializer,
 class StorView(ModelViewSet):
     queryset = Stor.objects.all()
     serializer_class = StorSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsPartnerPermisson]
+    permission_classes = [IsAuthenticated, IsPartnerPermisson]
     authentication_classes = [TokenAuthentication]
 
     def get_serializer(self, *args, **kwargs):
@@ -50,6 +50,12 @@ class StorView(ModelViewSet):
     def list(self, request):
         user = self.request.user
 
+        if 'category' in self.request.GET:
+            category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
+            stors = Stor.objects.filter(category_id=category.id)
+            serialized = StorSerializer(stors, many=True)
+            return Response(serialized.data)
+
         if user.is_superuser:
             serialized = OwnerStorSerializer(user.stors, many=True)
             return Response(serialized.data)
@@ -58,11 +64,11 @@ class StorView(ModelViewSet):
         serialized = StorSerializer(stors, many=True)
         return Response(serialized.data)
 
-    def filter_queryset(self, queryset):
-        if 'category' in self.request.GET:
-            category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
-            return queryset.filter(category_id=category.id)
-        return queryset
+    # def filter_queryset(self, queryset):
+    #     if 'category' in self.request.GET:
+    #         category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
+    #         return queryset.filter(category_id=category.id)
+    #     return queryset
 
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
