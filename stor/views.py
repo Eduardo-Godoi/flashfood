@@ -64,12 +64,6 @@ class StorView(ModelViewSet):
         serialized = StorSerializer(stors, many=True)
         return Response(serialized.data)
 
-    # def filter_queryset(self, queryset):
-    #     if 'category' in self.request.GET:
-    #         category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
-    #         return queryset.filter(category_id=category.id)
-    #     return queryset
-
     def destroy(self, request, *args, **kwargs):
         user = self.request.user
         stor = self.get_object()
