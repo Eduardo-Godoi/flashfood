@@ -3,10 +3,10 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from utils.permissions import IsPartnerPermisson
+from utils.permissions import IsCustumerPermission, IsPartnerPermisson
 
-from .models import Stor, StorCategory
-from .serializers import StorSerializer
+from .models import Review, Stor, StorCategory
+from .serializers import ReviewSerializer, StorSerializer
 
 
 class StorView(ModelViewSet):
@@ -38,7 +38,6 @@ class StorView(ModelViewSet):
             return queryset.filter(category_id=category.id)
         return queryset
 
-
     @action(detail=True, methods=['get'], url_path='products')
     def list_product(self, request,  *args, **kwargs):
         if 'category' in self.request.GET:
@@ -46,3 +45,25 @@ class StorView(ModelViewSet):
             return stor.products.filter(name__contains=self.request.GET['category'])
         serialized = ProductSerializer(stor.products, many=True)
         return Response(serialized.data)
+
+
+class ReviewView(ModelViewSet):
+
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsCustumerPermission]
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = get_object_or_404(queryset, user=self.request.user)
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    def filter_queryset(self, queryset):
+        stor = get_object_or_404(Stor, id=self.kwargs["pk"])
+        queryset = queryset.filter(stor=stor)
+
+        return super().filter_queryset(queryset)
