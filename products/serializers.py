@@ -54,3 +54,10 @@ class ProductSerializer(serializers.ModelSerializer):
         product.category = category
 
         return super().update(product, validated_data)
+
+
+class ProductStorSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "price"]

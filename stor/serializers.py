@@ -1,9 +1,12 @@
 from accounts.models import Adress
 from accounts.serializers import AdressSerializer, UserSerializer
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.fields import IntegerField
 
-from .models import Stor, StorCategory
+from .models import Review, Stor, StorCategory
+from utils.exceptions import UnprocessableEntity, BadRequest
 
 
 class StorCategorySerializer(serializers.ModelSerializer):
@@ -46,3 +49,39 @@ class StorSerializer(serializers.ModelSerializer):
         category.stors.add(instance_stor)
 
         return super().update(instance_stor, validated_data)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    stars = IntegerField(
+        validators=[MaxValueValidator(5), MinValueValidator(1)]
+    )
+
+    class Meta:
+        model = Review
+        fields = ["id", "stars", "review", "user"]
+
+    def create(self, validated_data):
+        stor_id = self.context['view'].kwargs["pk"]
+        stor = get_object_or_404(Stor, id=stor_id)
+        user = self.context["request"].user
+        if user.orders.count() == 0:
+            raise BadRequest
+
+        validated_data["user"] = user
+        validated_data["stor"] = stor
+
+        return super().create(validated_data)
+
+    def validate(self, attrs):
+        store_id = self.context['view'].kwargs["pk"]
+        user = self.context["request"].user
+        stor = get_object_or_404(Stor, id=store_id)
+        http_method = self.context["request"].method
+
+        has_review = stor.reviews.filter(user=user).first()
+
+        if has_review and http_method == "POST":
+            raise UnprocessableEntity()
+
+        return super().validate(attrs)
