@@ -1,17 +1,19 @@
 from django.shortcuts import get_object_or_404
 from products.models import ProductCategory
 from products.serializers import ProductSerializer, ProductStorSerializer
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from utils.exceptions import Unauthorized
 from utils.geolocation import calculate_route, geocoding
 from utils.permissions import IsCustumerPermission, IsPartnerPermisson
 
 from .models import Review, Stor, StorCategory
-from .serializers import (ReviewSerializer, StorCategorySerializer,
-                          StorSerializer)
+from .serializers import (OwnerStorSerializer, ReviewSerializer,
+                          StorCategorySerializer, StorSerializer)
 
 
 class StorView(ModelViewSet):
@@ -45,11 +47,33 @@ class StorView(ModelViewSet):
 
         return super().get_serializer(*args, **kwargs)
 
+    def list(self, request):
+        user = self.request.user
+
+        if user.is_superuser:
+            serialized = OwnerStorSerializer(user.stors, many=True)
+            return Response(serialized.data)
+
+        stors = Stor.objects.all()
+        serialized = StorSerializer(stors, many=True)
+        return Response(serialized.data)
+
     def filter_queryset(self, queryset):
         if 'category' in self.request.GET:
             category = get_object_or_404(StorCategory, name=self.request.GET['category'].title())
             return queryset.filter(category_id=category.id)
         return queryset
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.request.user
+        stor = self.get_object()
+
+        if user.id is not stor.owner.id:
+            raise Unauthorized()
+
+        self.perform_destroy(stor)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['get'], url_path='products')
     def list_product(self, request,  *args, **kwargs):
