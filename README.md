@@ -1,3 +1,31 @@
+# FLASHFOOD 🍟
+
+```
+FlashFood é um sistema desenvolvido para que pessoas possam encontrar Restaurantes, Pizzarias Hamburguerias... proximo ao seu endereço, e assim realizar um pedido no estabelecimento desejado.
+
+O sistema possui 2 tipos de usuarios, sendo eles:
+
+  - Partner
+  - Customer
+
+PARTNER:
+tem permissão para listar suas lojas, cadastrar uma loja e atualizar ou deletar uma loja específica
+
+CUSTOMER:
+tem permissão para listar as lojas próximas a seu endereço realizar um pedido e deixar um feedback em uma loja parceira após ter realizado um pedido
+
+```
+
+## Como Instalar?
+
+- Para instalar, é necessário clonar o projeto e fazer instalação das dependências.
+
+### Clonando o Projeto:
+
+```
+git clone https://gitlab.com/eduardogodoi/flashfood
+```
+
 ### `POST /api/accounts/` - Rota de criação de novos usuários.
 
 ```json
