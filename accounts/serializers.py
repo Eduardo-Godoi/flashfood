@@ -7,7 +7,7 @@ class AdressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Adress
-        exclude = ['coordinates']
+        fields = '__all__'
         extra_kwargs = {
             'id': {
                 'read_only': True
