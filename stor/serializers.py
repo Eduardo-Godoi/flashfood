@@ -34,6 +34,7 @@ class StorSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'category', 'owner', 'adress']
 
     def create(self, validated_data):
+
         user = self.context['request'].user
         adress_data = validated_data.pop('adress')
         category_data = validated_data.pop('category')
