@@ -485,7 +485,7 @@ ou
 
 ```
 
-### `GET /api/stor/products/?category=drink` - Listar produtos por categoria
+### `GET /api/stor/<stor_id>/products/?category=drink` - Listar produtos por categoria
 
 ```json
 // REQUEST
@@ -511,12 +511,25 @@ ou
 ```json
 // REQUEST
 // Header -> Authorization: Token <token-do-client>
-{}
+{
+  "products": [{ "id": 11, "quantity": 2 }]
+}
 ```
 
 ```json
 // RESPONSE STATUS -> HTTP 201 CREATED
-{}
+{
+  "id": 18,
+  "order_products": [
+    {
+      "product": 11,
+      "unit_price": 10.99,
+      "quantity": 2
+    }
+  ],
+  "date": "2021-12-02T19:56:29.527655Z",
+  "total_price": 21.98
+}
 ```
 
 ### `GET /api/order/<int:pk>/` - Listar Order por ID
@@ -524,12 +537,22 @@ ou
 ```json
 // REQUEST
 // Header -> Authorization: Token <token-do-partner-or-clientt>
-{}
 ```
 
 ```json
 // RESPONSE STATUS -> HTTP 200 OK
-{}
+{
+  "id": 18,
+  "order_products": [
+    {
+      "product": 11,
+      "unit_price": 10.99,
+      "quantity": 2
+    }
+  ],
+  "date": "2021-12-02T19:56:29.527655Z",
+  "total_price": 21.98
+}
 ```
 
 ### `GET /api/order/` - Listar Order
@@ -541,10 +564,33 @@ ou
 
 ```json
 // RESPONSE STATUS -> HTTP 200 OK
-{}
+{
+  "id": 18,
+  "order_products": [
+    {
+      "product": 11,
+      "unit_price": 10.99,
+      "quantity": 2
+    }
+  ],
+  "date": "2021-12-02T19:56:29.527655Z",
+  "total_price": 21.98
+},
+{
+  "id": 19,
+  "order_products": [
+    {
+      "product": 12,
+      "unit_price": 10.99,
+      "quantity": 1
+    }
+  ],
+  "date": "2021-12-02T19:56:29.527655Z",
+  "total_price": 10.99
+}
 ```
 
-### `GET /api/order/` - Listar lojas próximas
+### `GET /api/category/?category=hamburgueria` - Listar lojas próximas
 
 ```json
 // REQUEST
@@ -553,5 +599,21 @@ ou
 
 ```json
 // RESPONSE STATUS -> HTTP 200 OK
-{}
+[
+  {
+    "id": 4,
+    "name": "Burguer Nice",
+    "lengthInMeters": 2002
+  },
+  {
+    "id": 3,
+    "name": "Burguer Pinheiros",
+    "lengthInMeters": 2650
+  },
+  {
+    "id": 2,
+    "name": "Burguer Texas",
+    "lengthInMeters": 3977
+  }
+]
 ```
