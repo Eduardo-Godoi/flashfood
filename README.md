@@ -482,7 +482,7 @@ ou
 
 ```json
 // RESPONSE STATUS -> HTTP 204 NO CONTENT
-{}
+
 ```
 
 ### `GET /api/stor/products/?category=drink` - Listar produtos por categoria
